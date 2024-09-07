@@ -4,7 +4,7 @@ In this branch we are implementing the basic `ccwc` challenge in GoLang.
 
 ### Pre-Requisite:
 
-1. Download the test file to run the tests on.
+1. Download the test file to run the tests on. [Download Link](https://www.dropbox.com/scl/fi/d4zs6aoq6hr3oew2b6a9v/test.txt?rlkey=20c9d257pxd5emjjzd1gcbn03&dl=0)
 
 ### Steps:
 
