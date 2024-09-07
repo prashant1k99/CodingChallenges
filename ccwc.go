@@ -29,11 +29,10 @@ func getMultiByteCountForFile(fileContent string) int {
 
 func readFileContentInBuffer(fileName string) (string, error) {
 	file, err := os.Open(fileName)
-	defer file.Close()
-
 	if err != nil {
 		return "", err
 	}
+	defer file.Close()
 	content, err := io.ReadAll(file)
 	if err != nil {
 		return "", err
