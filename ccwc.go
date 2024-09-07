@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io"
@@ -49,46 +50,62 @@ func main() {
 	flag.Parse()
 
 	args := flag.Args()
-	if len(args) <= 0 {
-		fmt.Println("No file name passed to process")
-	}
-	content, err := readFileContentInBuffer(args[0])
-	if err != nil {
-		fmt.Println("Unable to read file content")
-		return
+	var fileContent string
+	if len(args) > 0 {
+		content, err := readFileContentInBuffer(args[0])
+		if err != nil {
+			fmt.Println("Unable to read file content")
+			return
+		}
+		fileContent = content
+	} else {
+		reader := bufio.NewReader(os.Stdin)
+		inputContent, err := io.ReadAll(reader)
+		if err != nil {
+			fmt.Println("Error reading from stdin:", err)
+			return
+		}
+		content := string(inputContent)
+		if len(content) == 0 {
+			fmt.Println("No input provided")
+			return
+		}
+		fileContent = content
 	}
 
 	finalResponse := ""
 
 	if *byteFlag {
-		length := getBytesOfFile(content)
+		length := getBytesOfFile(fileContent)
 		finalResponse += strconv.Itoa(length) + "  "
 	}
 	if *lineFlag {
-		length := getLineCountOfFile(content)
+		length := getLineCountOfFile(fileContent)
 		finalResponse += strconv.Itoa(length) + "  "
 	}
 	if *wordFlag {
-		length := getWordCountOfFile(content)
+		length := getWordCountOfFile(fileContent)
 		finalResponse += strconv.Itoa(length) + "  "
 	}
 	if *multiByteFlag {
-		length := getMultiByteCountForFile(content)
+		length := getMultiByteCountForFile(fileContent)
 		finalResponse += strconv.Itoa(length) + "  "
 	}
 	if !*byteFlag && !*lineFlag && !*wordFlag && !*multiByteFlag {
-		length := getBytesOfFile(content)
+		length := getBytesOfFile(fileContent)
 		finalResponse += strconv.Itoa(length) + "  "
 
-		length = getLineCountOfFile(content)
+		length = getLineCountOfFile(fileContent)
 		finalResponse += strconv.Itoa(length) + "  "
 
-		length = getWordCountOfFile(content)
+		length = getWordCountOfFile(fileContent)
 		finalResponse += strconv.Itoa(length) + "  "
 
-		length = getMultiByteCountForFile(content)
+		length = getMultiByteCountForFile(fileContent)
 		finalResponse += strconv.Itoa(length) + "  "
 	}
-	finalResponse += args[0]
+	if len(args) > 0 {
+		finalResponse += args[0]
+	}
 	fmt.Println(finalResponse)
 }

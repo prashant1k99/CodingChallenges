@@ -46,7 +46,7 @@ In this branch we are implementing the basic `ccwc` challenge in GoLang.
   7145   58164  342190 test.txt
   ```
 
-- [ ] Support being able to read from standard input if no filename is specified
+- [x] Support being able to read from standard input if no filename is specified
 
   ```sh
   >cat test.txt | ccwc -l
