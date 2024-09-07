@@ -8,7 +8,7 @@ In this branch we are implementing the basic `ccwc` challenge in GoLang.
 
 ### Steps:
 
-- [ ] Return the number of bytes in the file.
+- [x] Return the number of bytes in the file.
 
   ```sh
   ccwc -c test.txt
