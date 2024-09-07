@@ -22,14 +22,14 @@ In this branch we are implementing the basic `ccwc` challenge in GoLang.
   7145 test.txt
   ```
 
-- [ ] Return the word counts the file.
+- [x] Return the word counts the file.
 
   ```sh
   ccwc -w test.txt
   58164 test.txt
   ```
 
-- [ ] Return the multibyte characters count from the file
+- [x] Return the multibyte characters count from the file
 
   ```sh
   >wc -m test.txt
