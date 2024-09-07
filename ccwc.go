@@ -6,33 +6,41 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 )
 
-func getBytesOfFile(fileContentInByte []byte) int {
+func getBytesOfFile(fileContentInByte string) int {
 	return len(fileContentInByte)
 }
 
-func readFileAndReturnContent(fileName string) ([]byte, error) {
+func getLineCountOfFile(fileContent string) int {
+	return len(strings.Split(fileContent, "\n"))
+}
+
+func readFileContentInBuffer(fileName string) (string, error) {
 	file, err := os.Open(fileName)
+	defer file.Close()
+
 	if err != nil {
-		return []byte(""), err
+		return "", err
 	}
 	content, err := io.ReadAll(file)
 	if err != nil {
-		return []byte(""), err
+		return "", err
 	}
-	return content, nil
+	return string(content), nil
 }
 
 func main() {
 	byteFlag := flag.Bool("c", false, "Get number of bytes for a file")
+	lineFlag := flag.Bool("l", false, "Get number of lines for a file")
 	flag.Parse()
 
 	args := flag.Args()
 	if len(args) <= 0 {
 		fmt.Println("No file name passed to process")
 	}
-	content, err := readFileAndReturnContent(args[0])
+	content, err := readFileContentInBuffer(args[0])
 	if err != nil {
 		fmt.Println("Unable to read file content")
 		return
@@ -42,6 +50,10 @@ func main() {
 
 	if *byteFlag {
 		length := getBytesOfFile(content)
+		finalResponse += strconv.Itoa(length) + "  "
+	}
+	if *lineFlag {
+		length := getLineCountOfFile(content)
 		finalResponse += strconv.Itoa(length) + "  "
 	}
 	finalResponse += args[0]

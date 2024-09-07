@@ -15,7 +15,7 @@ In this branch we are implementing the basic `ccwc` challenge in GoLang.
   342190 test.txt
   ```
 
-- [ ] Return the number of lines in the file.
+- [x] Return the number of lines in the file.
 
   ```sh
   ccwc -l test.txt
