@@ -39,7 +39,7 @@ In this branch we are implementing the basic `ccwc` challenge in GoLang.
   339292 test.txt
   ```
 
-- [ ] Support default option, when no option is passed -c, -l and -w options
+- [x] Support default option, when no option is passed -c, -l and -w options
 
   ```sh
   >ccwc test.txt

@@ -76,6 +76,19 @@ func main() {
 		length := getMultiByteCountForFile(content)
 		finalResponse += strconv.Itoa(length) + "  "
 	}
+	if !*byteFlag && !*lineFlag && !*wordFlag && !*multiByteFlag {
+		length := getBytesOfFile(content)
+		finalResponse += strconv.Itoa(length) + "  "
+
+		length = getLineCountOfFile(content)
+		finalResponse += strconv.Itoa(length) + "  "
+
+		length = getWordCountOfFile(content)
+		finalResponse += strconv.Itoa(length) + "  "
+
+		length = getMultiByteCountForFile(content)
+		finalResponse += strconv.Itoa(length) + "  "
+	}
 	finalResponse += args[0]
 	fmt.Println(finalResponse)
 }
