@@ -15,7 +15,7 @@ EX:
 cat <fileName>.json | ccjp
 ```
 
-- [ ] Identify Valid JSON to Invalid JSON.
+- [x] Identify Valid JSON to Invalid JSON.
       When a proper JSON is passed, it should exit with status code 0 and simply print the Input, othewise with status code 1.
 
 - [ ] Extend the JSON Parser to simple String Key and String Value
