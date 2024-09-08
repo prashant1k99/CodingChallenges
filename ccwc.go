@@ -54,7 +54,7 @@ func main() {
 		stat, _ := os.Stdin.Stat()
 		if (stat.Mode() & os.ModeCharDevice) != 0 {
 			fmt.Println("No input provided and no file name specified")
-			return
+			os.Exit(1)
 		}
 	}
 
@@ -63,7 +63,7 @@ func main() {
 		content, err := readFileContent(args[0])
 		if err != nil {
 			fmt.Println("Unable to read file content")
-			return
+			os.Exit(1)
 		}
 		fileContent = content
 	} else {
@@ -71,12 +71,12 @@ func main() {
 		inputContent, err := io.ReadAll(reader)
 		if err != nil {
 			fmt.Println("Error reading from stdin:", err)
-			return
+			os.Exit(1)
 		}
 		content := string(inputContent)
 		if len(content) == 0 {
 			fmt.Println("No input provided")
-			return
+			os.Exit(1)
 		}
 		fileContent = content
 	}
@@ -116,4 +116,5 @@ func main() {
 		finalResponse += args[0]
 	}
 	fmt.Println(finalResponse)
+	os.Exit(0)
 }
