@@ -11,8 +11,8 @@ import (
 	"unicode/utf8"
 )
 
-func getBytesOfFile(fileContentInByte string) int {
-	return len(fileContentInByte)
+func getBytesOfFile(fileContent string) int {
+	return len(fileContent)
 }
 
 func getLineCountOfFile(fileContent string) int {
@@ -27,7 +27,7 @@ func getMultiByteCountForFile(fileContent string) int {
 	return utf8.RuneCountInString(fileContent)
 }
 
-func readFileContentInBuffer(fileName string) (string, error) {
+func readFileContent(fileName string) (string, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return "", err
@@ -49,9 +49,18 @@ func main() {
 	flag.Parse()
 
 	args := flag.Args()
+
+	if len(args) == 0 {
+		stat, _ := os.Stdin.Stat()
+		if (stat.Mode() & os.ModeCharDevice) != 0 {
+			fmt.Println("No input provided and no file name specified")
+			return
+		}
+	}
+
 	var fileContent string
 	if len(args) > 0 {
-		content, err := readFileContentInBuffer(args[0])
+		content, err := readFileContent(args[0])
 		if err != nil {
 			fmt.Println("Unable to read file content")
 			return
