@@ -7,15 +7,63 @@ import (
 	"os"
 )
 
-func IsValidJSON(content string) bool {
-	// If the content either starts with [ or {, then it's a valid Json
-	if len(content) == 0 {
-		return false
+type TokenType int
+
+const (
+	BraceOpen TokenType = iota
+	BraceClose
+	BracketOpen
+	BracketClose
+	Colon
+	Comma
+	Number
+	String
+	Bool
+	Null
+)
+
+type Token struct {
+	Value string
+	Type  TokenType
+}
+
+func Tokenizer(contentToBeParsed string) ([]Token, error) {
+	if len(contentToBeParsed) == 0 {
+		return nil, fmt.Errorf("invalid input")
 	}
-	if string(content[0]) == "{" || string(content[0]) == "[" {
-		return true
+	var tokenizedResponse []Token
+	for index, content := range contentToBeParsed {
+		switch content {
+		case '{':
+			tokenizedResponse = append(tokenizedResponse, Token{
+				Value: string(content),
+				Type:  BraceOpen,
+			})
+		case '}':
+			tokenizedResponse = append(tokenizedResponse, Token{
+				Value: string(content),
+				Type:  BraceClose,
+			})
+		case '[':
+			tokenizedResponse = append(tokenizedResponse, Token{
+				Value: string(content),
+				Type:  BracketOpen,
+			})
+		case ']':
+			tokenizedResponse = append(tokenizedResponse, Token{
+				Value: string(content),
+				Type:  BracketClose,
+			})
+		case ':':
+			tokenizedResponse = append(tokenizedResponse, Token{
+				Value: string(content),
+				Type:  Colon,
+			})
+		default:
+			return nil, fmt.Errorf("unable to parse content at [%d]", index)
+		}
 	}
-	return false
+	return tokenizedResponse, nil
 }
 
 func main() {
@@ -26,12 +74,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Check for valid opening of content
-	isValid := IsValidJSON(string(content))
-	if !isValid {
-		fmt.Println("Invalid JSON is passed")
+	token, err := Tokenizer(string(content))
+	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println(string(content))
+	for _, t := range token {
+		fmt.Println(t)
+	}
 	os.Exit(0)
 }
