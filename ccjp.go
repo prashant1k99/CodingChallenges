@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"unicode"
 )
 
 type TokenType int
@@ -32,38 +33,70 @@ func Tokenizer(contentToBeParsed string) ([]Token, error) {
 		return nil, fmt.Errorf("invalid input")
 	}
 	var tokenizedResponse []Token
-	for index, content := range contentToBeParsed {
-		switch content {
+	i := 0
+	for i < len(contentToBeParsed) {
+		char := contentToBeParsed[i]
+		switch char {
 		case '{':
 			tokenizedResponse = append(tokenizedResponse, Token{
-				Value: string(content),
-				Type:  BraceOpen,
+				string(char),
+				BraceOpen,
 			})
+			i++
 		case '}':
 			tokenizedResponse = append(tokenizedResponse, Token{
-				Value: string(content),
-				Type:  BraceClose,
+				string(char),
+				BraceClose,
 			})
+			i++
 		case '[':
 			tokenizedResponse = append(tokenizedResponse, Token{
-				Value: string(content),
-				Type:  BracketOpen,
+				string(char),
+				BracketOpen,
 			})
+			i++
 		case ']':
 			tokenizedResponse = append(tokenizedResponse, Token{
-				Value: string(content),
-				Type:  BracketClose,
+				string(char),
+				BracketClose,
 			})
+			i++
 		case ':':
 			tokenizedResponse = append(tokenizedResponse, Token{
-				Value: string(content),
-				Type:  Colon,
+				string(char),
+				Colon,
 			})
+			i++
+		case ',':
+			tokenizedResponse = append(tokenizedResponse, Token{
+				string(char),
+				Comma,
+			})
+			i++
+		case '"':
+			completeString, len := readCompleteString(contentToBeParsed[i:])
+			tokenizedResponse = append(tokenizedResponse, Token{
+				completeString,
+				String,
+			})
+			i += len
 		default:
-			return nil, fmt.Errorf("unable to parse content at [%d]", index)
+			if unicode.IsSpace(rune(char)) {
+				i++
+			} else {
+				return nil, fmt.Errorf("unable to parse content at [%d]", i)
+			}
 		}
 	}
 	return tokenizedResponse, nil
+}
+
+func readCompleteString(input string) (string, int) {
+	i := 1
+	for i < len(input) && input[i] != '"' {
+		i++
+	}
+	return input[1:i], i + 1
 }
 
 func main() {
