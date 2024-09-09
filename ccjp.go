@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"unicode"
 )
 
@@ -83,6 +84,32 @@ func Tokenizer(contentToBeParsed string) ([]Token, error) {
 		default:
 			if unicode.IsSpace(rune(char)) {
 				i++
+			} else if unicode.IsDigit(rune(char)) || char == '-' {
+				numericValue, len := readCompleteNumber(contentToBeParsed[i:])
+				tokenizedResponse = append(tokenizedResponse, Token{
+					numericValue,
+					Number,
+				})
+				i += len
+				// Get the number content as the input
+			} else if strings.HasPrefix(contentToBeParsed[i:], "true") {
+				tokenizedResponse = append(tokenizedResponse, Token{
+					"true",
+					Bool,
+				})
+				i += 4
+			} else if strings.HasPrefix(contentToBeParsed[i:], "false") {
+				tokenizedResponse = append(tokenizedResponse, Token{
+					"false",
+					Bool,
+				})
+				i += 5
+			} else if strings.HasPrefix(contentToBeParsed[i:], "null") {
+				tokenizedResponse = append(tokenizedResponse, Token{
+					"null",
+					Null,
+				})
+				i += 4
 			} else {
 				return nil, fmt.Errorf("unable to parse content at [%d]", i)
 			}
@@ -91,12 +118,24 @@ func Tokenizer(contentToBeParsed string) ([]Token, error) {
 	return tokenizedResponse, nil
 }
 
+func readCompleteNumber(input string) (string, int) {
+	i := 0
+	for i < len(input) && (unicode.IsDigit(rune(input[i])) || input[i] == '.' || input[i] == '-') {
+		i++
+	}
+	return input[:i], i
+}
+
 func readCompleteString(input string) (string, int) {
 	i := 1
 	for i < len(input) && input[i] != '"' {
 		i++
 	}
 	return input[1:i], i + 1
+}
+
+func JSONParser(tokens []Token) (string, error) {
+	return "", nil
 }
 
 func main() {
