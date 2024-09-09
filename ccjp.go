@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -111,7 +112,7 @@ func Tokenizer(contentToBeParsed string) ([]Token, error) {
 				})
 				i += 4
 			} else {
-				return nil, fmt.Errorf("unable to parse content at [%d]", i)
+				return nil, fmt.Errorf("unable to parse content at [%d] at char: %v", i, string(contentToBeParsed[i]))
 			}
 		}
 	}
@@ -120,7 +121,7 @@ func Tokenizer(contentToBeParsed string) ([]Token, error) {
 
 func readCompleteNumber(input string) (string, int) {
 	i := 0
-	for i < len(input) && (unicode.IsDigit(rune(input[i])) || input[i] == '.' || input[i] == '-') {
+	for i < len(input) && (unicode.IsDigit(rune(input[i])) || input[i] == '.' || input[i] == '-' || input[i] == 'e' || input[i] == 'E' || input[i] == '+') {
 		i++
 	}
 	return input[:i], i
@@ -139,12 +140,98 @@ type (
 	JSONArray  []interface{}
 )
 
-func parseArray(tokens []Token) (JSONArray, error) {
-	return nil, nil
+func parseArray(tokens []Token) (JSONArray, []Token, error) {
+	arr := JSONArray{}
+	expectingString := true
+
+	for len(tokens) > 0 {
+		token := tokens[0]
+		tokens = tokens[1:]
+		switch token.Type {
+		case BracketClose:
+			return arr, tokens, nil
+		case Comma:
+			if expectingString {
+				return nil, nil, fmt.Errorf("unexpected \",\", expecting value but got: %v", token.Value)
+			}
+		default:
+			value, tks, err := parseValue(tokens)
+			if err != nil {
+				return nil, nil, err
+			}
+			tokens = tks
+			arr = append(arr, value)
+			continue
+		}
+	}
+	return nil, nil, errors.New("missing clossing bracket")
 }
 
-func parseObject(tokens []Token) (JSONObject, error) {
-	return nil, nil
+func parseValue(tokens []Token) (interface{}, []Token, error) {
+	token := tokens[0]
+	tokens = tokens[1:]
+
+	switch token.Type {
+	case String:
+		return token.Value, tokens, nil
+	case Number:
+		return token.Value, tokens, nil
+	case Bool:
+		if token.Value == "true" {
+			return true, tokens, nil
+		} else {
+			return false, tokens, nil
+		}
+	case Null:
+		return nil, tokens, nil
+	case BraceOpen:
+		return parseObject(tokens)
+	case BracketOpen:
+		return parseArray(tokens)
+	default:
+		return nil, nil, errors.New("unexpected token")
+	}
+}
+
+func parseObject(tokens []Token) (JSONObject, []Token, error) {
+	obj := JSONObject{}
+	var key string
+	expectKey := true
+
+	for len(tokens) > 0 {
+		token := tokens[0]
+		tokens = tokens[1:]
+		switch token.Type {
+		case BraceClose:
+			return obj, tokens, nil
+		case Comma:
+			if len(tokens) > 0 && tokens[0].Type == BraceClose {
+				return nil, nil, errors.New("unexpected trailing comma found at Comma")
+			}
+			continue
+		case String:
+			if expectKey {
+				key = token.Value
+				expectKey = false
+			} else {
+				return nil, nil, fmt.Errorf("unexpected string value, expected : or , but got %v", token.Value)
+			}
+		case Colon:
+			if expectKey {
+				return nil, nil, errors.New("unexpected colon, expecting key")
+			}
+			value, tks, err := parseValue(tokens)
+			if err != nil {
+				return nil, nil, err
+			}
+			tokens = tks
+			obj[key] = value
+			expectKey = true
+		default:
+			return nil, nil, fmt.Errorf("unexpected token: %v", token.Value)
+		}
+	}
+	return nil, nil, errors.New("missing closing brace")
 }
 
 func JSONParser(tokens []Token) (interface{}, error) {
@@ -152,15 +239,15 @@ func JSONParser(tokens []Token) (interface{}, error) {
 
 	switch initialToken.Type {
 	case BraceOpen:
-		parsedObject, err := parseObject(tokens)
+		parsedObject, _, err := parseObject(tokens[1:])
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error parsing object: %v", err)
 		}
 		return parsedObject, nil
 	case BracketOpen:
-		parsedArray, err := parseArray(tokens)
+		parsedArray, _, err := parseArray(tokens[1:])
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error parsing array: %v", err)
 		}
 		return parsedArray, nil
 	default:

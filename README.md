@@ -18,13 +18,13 @@ cat <fileName>.json | ccjp
 - [x] Identify Valid JSON to Invalid JSON.
       When a proper JSON is passed, it should exit with status code 0 and simply print the Input, othewise with status code 1.
 
-- [ ] Extend the JSON Parser to simple String Key and String Value
+- [x] Extend the JSON Parser to simple String Key and String Value
 
   ```json
   { "key": "value" }
   ```
 
-- [ ] In this step, the goal is to extend the parser for the simple value where key will be string and the value can be string, number, null, float and boolean.
+- [x] In this step, the goal is to extend the parser for the simple value where key will be string and the value can be string, number, null, float and boolean.
 
   ```json
   {
@@ -36,7 +36,7 @@ cat <fileName>.json | ccjp
   }
   ```
 
-- [ ] In this step, we want to parse arrays and objects in the JSON:
+- [x] In this step, we want to parse arrays and objects in the JSON:
 
   ```json
   {
@@ -47,4 +47,4 @@ cat <fileName>.json | ccjp
   }
   ```
 
-- [ ] In this step we are going to thoroughly test our implementation based on the numerouse test cases.
+- [x] In this step we are going to thoroughly test our implementation based on the numerouse test cases.
