@@ -134,8 +134,38 @@ func readCompleteString(input string) (string, int) {
 	return input[1:i], i + 1
 }
 
-func JSONParser(tokens []Token) (string, error) {
-	return "", nil
+type (
+	JSONObject map[string]interface{}
+	JSONArray  []interface{}
+)
+
+func parseArray(tokens []Token) (JSONArray, error) {
+	return nil, nil
+}
+
+func parseObject(tokens []Token) (JSONObject, error) {
+	return nil, nil
+}
+
+func JSONParser(tokens []Token) (interface{}, error) {
+	initialToken := tokens[0]
+
+	switch initialToken.Type {
+	case BraceOpen:
+		parsedObject, err := parseObject(tokens)
+		if err != nil {
+			return nil, err
+		}
+		return parsedObject, nil
+	case BracketOpen:
+		parsedArray, err := parseArray(tokens)
+		if err != nil {
+			return nil, err
+		}
+		return parsedArray, nil
+	default:
+		return nil, fmt.Errorf("invalid value at index 0")
+	}
 }
 
 func main() {
@@ -146,13 +176,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	token, err := Tokenizer(string(content))
+	tokens, err := Tokenizer(string(content))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	for _, t := range token {
-		fmt.Println(t)
+	parsedInput, err := JSONParser(tokens)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
+	fmt.Println(parsedInput)
 	os.Exit(0)
 }
